@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = express();
+const dns = require('dns');
+const urlParser = require('url');
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
