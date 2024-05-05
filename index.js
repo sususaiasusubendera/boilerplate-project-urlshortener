@@ -43,10 +43,19 @@ app.post("/api/shorturl", (req, res) => {
     if (!address) {
       res.json({ error: "Invalid URL"})
     } else {
-
+      const urlCount = await urls.countDocuments({});
+      const urlDoc = {
+        url,
+        short_url: urlCount
+      }
+      const result = await urls.insertOne(urlDoc);
+      console.log(result);
+      res.json({
+        original_url: url,
+        short_url: urlCount
+      });
     }
   });
-  res.json({ greeting: "hello"});
   // const url = req.body.url;
   // const urlObject = new URL(url);
   // const dnslookup = dns.lookup(
