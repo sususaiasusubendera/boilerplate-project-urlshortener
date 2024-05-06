@@ -36,13 +36,14 @@ app.get("/api/hello", function (req, res) {
 });
 
 // tests
+// test 2
 app.post("/api/shorturl", (req, res) => {
   console.log(req.body);
   const url = req.body.url;
   // url.parse() is deprecated, use new URL() instead
   const dnslookup = dns.lookup(new URL(url).hostname, async (err, address) => {
     if (!address) {
-      res.json({ error: "Invalid URL"});
+      res.json({ error: "Invalid URL"}); // test 4
     } else {
       const urlCount = await urls.countDocuments({});
       const urlDoc = {
@@ -59,6 +60,18 @@ app.post("/api/shorturl", (req, res) => {
   });
 });
 
+// test 3
+app.get("/api/shorturl/:short_url", async (req, res) => {
+  const shorturl = req.params.short_url;
+  const urlDoc = await urls.findOne({ short_url: +shorturl });
+  res.redirect(urlDoc.url);
+});
+
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 });
+
+/*
+p.s.
+use await for database method (async-await)
+*/
