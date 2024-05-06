@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const { MongoClient } = require("mongodb");
 const dns = require("dns");
-// const urlParser = require('url'); //
+// const urlParser = require('url'); // url.parse() usage was deprecated
 const { URL } = require("url");
 
 // database connection
@@ -19,12 +19,12 @@ const port = process.env.PORT || 3000;
 // middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // check false (OK)
 
 app.use("/public", express.static(`${process.cwd()}/public`));
 
 // use body-parser to parse POST requests
-// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: false })); // check using bodyParser + check false (OK + OK)
 
 app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
@@ -39,9 +39,10 @@ app.get("/api/hello", function (req, res) {
 app.post("/api/shorturl", (req, res) => {
   console.log(req.body);
   const url = req.body.url;
+  // url.parse() is deprecated, use new URL() instead
   const dnslookup = dns.lookup(new URL(url).hostname, async (err, address) => {
     if (!address) {
-      res.json({ error: "Invalid URL"})
+      res.json({ error: "Invalid URL"});
     } else {
       const urlCount = await urls.countDocuments({});
       const urlDoc = {
@@ -56,31 +57,6 @@ app.post("/api/shorturl", (req, res) => {
       });
     }
   });
-  // const url = req.body.url;
-  // const urlObject = new URL(url);
-  // const dnslookup = dns.lookup(
-  //   urlObject.hostname, 
-  //   async (err, address) => {
-  //     if (!address) {
-  //       res.json({
-  //         error: "Invalid URL",
-  //       });
-  //     } else {
-  //       const urlCount = await urls.countDocuments({});
-  //       const urlDoc = {
-  //         url,
-  //         short_url: urlCount,
-  //       };
-
-  //       const result = await urls.insertOne(urlDoc);
-  //       console.log(result);
-  //       res.json({
-  //         original_url: url,
-  //         short_url: urlCount,
-  //       });
-  //     }
-  //   }
-  // );
 });
 
 app.listen(port, function () {
